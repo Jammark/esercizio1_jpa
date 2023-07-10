@@ -1,0 +1,74 @@
+CREATE TABLE public.fornitori
+(
+    numero_fornitore bigint NOT NULL,
+    denominazione character varying,
+    regione_residenza character varying,
+    PRIMARY KEY (numero_fornitore)
+);
+
+ALTER TABLE IF EXISTS public.fornitori
+    OWNER to postgres;
+
+
+CREATE TABLE public.clienti
+(
+    numero_cliente bigint NOT NULL,
+    nome character varying,
+     cognome character varying,
+     data_nascita date,
+     regione_residenza character varying,
+     PRIMARY KEY (numero_cliente)
+);
+
+CREATE TABLE public.fatture 
+(
+    numero_fattura bigint NOT NULL,
+    tipologia character varying NOT NULL,
+    importo integer NOT NULL,
+    iva character varying,
+    id_cliente bigint NOT NULL,
+    data_fattura date,
+    numero_fornitore bigint NOT NULL
+
+);
+
+ALTER TABLE IF EXISTS public.fatture
+    ADD FOREIGN KEY (id_cliente)
+    REFERENCES public.clienti (numero_cliente) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+ALTER TABLE IF EXISTS public.fatture
+    ADD FOREIGN KEY (numero_fornitore)
+    REFERENCES public.fornitori (numero_fornitore) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+    CREATE TABLE public.prodotti
+(
+    id_prodotto bigint NOT NULL,
+    descrizione character varying,
+    in_produzione boolean NOT NULL,
+    in_commercio boolean NOT NULL,
+    data_attivazione date,
+    data_disattivazione date,
+    PRIMARY KEY (id_prodotto)
+);
+
+SELECT numero_cliente, nome, cognome, data_nascita, regione_residenza
+	FROM public.clienti c where c.data_nascita between '1982-1-1' and '1982-12-31';
+
+    SELECT numero_fattura, tipologia, importo, iva, id_cliente, data_fattura, numero_fornitore
+	FROM public.fatture f where f.iva = '20%';
+
+SELECT count(*), sum(f.importo / extract(year from f.data_fattura) )
+	FROM public.fatture f;
+
+
+SELECT id_prodotto, descrizione, in_produzione, in_commercio, data_attivazione, data_disattivazione
+	FROM public.prodotti p where extract(year from p.data_attivazione) = 2017 and p.in_commercio or p.in_produzione;
+
+    SELECT count(*), extract(year from data_fattura)
+	FROM public.fatture f where iva = '20%' group by extract(year from data_fattura);
