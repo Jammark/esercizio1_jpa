@@ -72,3 +72,15 @@ SELECT id_prodotto, descrizione, in_produzione, in_commercio, data_attivazione, 
 
     SELECT count(*), extract(year from data_fattura)
 	FROM public.fatture f where iva = '20%' group by extract(year from data_fattura);
+
+    SELECT extract(year from f.data_fattura), count(*) 
+	FROM public.fatture f where f.tipologia = 'A' and (select count(*) from public.fatture f1 where f1.tipologia = 'A') >=2 group by extract(year from f.data_fattura);
+
+    SELECT f.numero_fattura, f.importo, f.iva,  f.data_fattura, fr.denominazione
+	FROM public.fatture f join public.fornitori fr using(numero_fornitore);
+
+    SELECT count(*)
+	FROM public.clienti c join public.fatture f on c.numero_cliente = f.id_cliente where f.importo > 50 and extract(year from c.data_nascita)= 1980;
+
+    SELECT concat(c.nome ,'-' ,c.cognome) as denominazione
+	FROM public.clienti c where c.regione_residenza = 'Lombardia';
